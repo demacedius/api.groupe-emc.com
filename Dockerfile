@@ -1,5 +1,5 @@
 # Dockerfile pour Symfony + Railway
-FROM php:8.1-fpm-alpine
+FROM php:8.2-fpm-alpine
 
 # Installation des dépendances système
 RUN apk add --no-cache \
