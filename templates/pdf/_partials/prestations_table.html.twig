@@ -1,0 +1,77 @@
+<table class="prestations-table">
+    <thead>
+        <tr>
+            <th class="prestation-name">Prestation</th>
+            <th class="description">Description</th>
+            <th class="unite">Unité</th>
+            <th class="prix-unitaire">Prix U. HT</th>
+            <th class="quantite">Quantité</th>
+            <th class="total">Total HT</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in sell.sellItems %}
+            <tr>
+                <td class="prestation-name">
+                    {% if item.servicePackage %}
+                        {{ item.servicePackage.name|upper }}
+                    {% elseif item.service %}
+                        {{ item.service.title|upper }}
+                    {% else %}
+                        {{ item.description|upper }}
+                    {% endif %}
+                </td>
+                <td class="description">
+                    {% if item.servicePackage %}
+                        {{ item.servicePackage.description }}
+                    {% elseif item.service %}
+                        {% if item.service.title == "Isolation des combles perdus" %}
+Fourniture d'un isolant en laine de roche
+Laine de roche R=1,65m².K/W
+70 mm d'épaisseur
+ACERMI : 02/015/003
+PRODUIT UTILISÉ : « TOTROCK KRAFT »
+FABRICANT : ROCKWOOL
+Fourniture d'un isolant par thermo-réflexion
+R=3,80m².K/W (selon norme ISO 9869)
+                        {% elseif item.service.title == "Ravalement de cheminée" %}
+Décapage de l'ancien revêtement si
+nécessaire
+Nettoyage de la façade à pression contrôlée
+Application d'une couche d'enduit de
+ragréage organique fibré composé de résine
+copolymères acryliques
+                        {% elseif item.service.title == "Étanchéité cheminée" %}
+Entourage de la cheminée avec bande de
+plomb
+                        {% else %}
+                            {{ item.description }}
+                        {% endif %}
+                    {% else %}
+                        {{ item.description }}
+                    {% endif %}
+                </td>
+                <td class="unite text-center">
+                    {% if item.service and item.service.title == "Isolation des combles perdus" %}
+                        m²
+                    {% else %}
+                        Forfait
+                    {% endif %}
+                </td>
+                <td class="prix-unitaire text-center">
+                    {{ item.price|number_format(2, ',', ' ') }} €
+                </td>
+                <td class="quantite text-center">
+                    {% if item.service and item.service.title == "Isolation des combles perdus" %}
+                        14
+                    {% else %}
+                        1
+                    {% endif %}
+                </td>
+                <td class="total text-center">
+                    {{ item.total|number_format(2, ',', ' ') }} €
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

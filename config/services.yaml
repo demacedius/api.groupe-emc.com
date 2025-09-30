@@ -1,0 +1,105 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    app.baseurl: '%env(BASE_URL)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    Symfony\Component\Serializer\Normalizer\DateTimeNormalizer:
+        arguments:
+            $defaultContext:
+                datetime_format: 'd/m/Y H:i'
+                datetime_timezone: 'Europe/Paris'
+
+    # App\DataPersister\UserDataPersister:
+    #     decorates: 'api_platform.doctrine.orm.data_persister'
+
+    App\DataPersister\CustomerDataPersister:
+        tags: [ 'api_platform.data_persister' ]
+
+    App\DataPersister\ServiceDataPersister:
+        tags: [ 'api_platform.data_persister' ]
+
+    App\DataPersister\ServiceCategoryDataPersister:
+        tags: [ 'api_platform.data_persister' ]
+
+    groupe_emc_api.event.authentication_success_listener:
+        class: App\EventListener\AuthenticationSuccessListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }
+
+    groupe_emc_api.event.authentication_failure_listener:
+        class: App\EventListener\AuthenticationFailureListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onAuthenticationFailureResponse }
+
+    App\Doctrine\SellListener:
+        tags:
+            - { name: doctrine.orm.entity_listener }
+
+    App\Doctrine\AppointmentSetUserListener:
+        tags:
+            - { name: doctrine.orm.entity_listener }
+
+    App\DataProvider\SalesByUserDataProvider:
+        tags: [{ name: 'api_platform.collection_data_provider', priority: 2 }]
+        autoconfigure: false
+
+    App\DataProvider\AppointmentsByUserDataProvider:
+        tags: [{ name: 'api_platform.collection_data_provider', priority: 2 }]
+        autoconfigure: false
+
+    App\DataProvider\CustomersByUserDataProvider:
+        tags: [{ name: 'api_platform.collection_data_provider', priority: 2 }]
+        autoconfigure: false
+
+    App\DataProvider\UsersDataProvider:
+        tags: [{ name: 'api_platform.collection_data_provider', priority: 2 }]
+        autoconfigure: false
+
+    'App\Serializer\AdminContextBuilder':
+        decorates: 'api_platform.serializer.context_builder'
+        arguments: [ '@App\Serializer\AdminContextBuilder.inner' ]
+        autoconfigure: false
+
+    'App\Serializer\SuperAdminContextBuilder':
+        decorates: 'api_platform.serializer.context_builder'
+        arguments: [ '@App\Serializer\SuperAdminContextBuilder.inner' ]
+        autoconfigure: false
+
+    'App\Serializer\AllNotSalesContextBuilder':
+        decorates: 'api_platform.serializer.context_builder'
+        arguments: [ '@App\Serializer\AllNotSalesContextBuilder.inner' ]
+        autoconfigure: false
+
+    App\Service\PostalCodeExtractor:
+        autowire: true
+
+    App\EventListener\CustomerPostalCodeListener:
+        tags:
+            - { name: doctrine.event_subscriber }

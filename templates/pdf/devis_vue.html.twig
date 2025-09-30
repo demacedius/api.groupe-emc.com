@@ -1,0 +1,269 @@
+{% extends "pdf/document_base_vue.html.twig" %}
+
+{% block title %}Devis N°{{ sell.id }}{% endblock %}
+
+{% block content %}
+    <!-- Header avec logos -->
+    <div class="pdf__header">
+        <div class="row">
+            <div class="col-4">
+                {% if sell.company %}
+                    <img class="logo" src="/logos/{{ sell.company.prefix }}.png" alt="Logo">
+                {% endif %}
+            </div>
+            <div class="offset-4 col-4 mt-2 text-end">
+                <img class="logo" src="/certif/smabtp.jpg" alt="SMABTP">
+                {% if sell.company and sell.company.prefix != '3M' %}
+                    <img class="logo" src="/certif/rge-qualibat.png" alt="RGE Qualibat">
+                {% endif %}
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12 text-center">
+                <div class="title">
+                    DEVIS<br>
+                    N°{{ sell.id }}<br>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-7">
+                <div class="info info--medium">
+                    {% if sell.customer %}
+                        {{ sell.customer.firstname }} {{ sell.customer.lastname }}<br>
+                        {{ sell.customer.address }}, {{ sell.customer.postcode }} {{ sell.customer.city }}<br>
+                        {{ sell.customer.phone ?: sell.customer.mobile }}<br>
+                        {{ sell.customer.email }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-5">
+                <div class="info info--medium">
+                    Exemplaire client<br>
+                    Date : {{ sell.createdDate|date('d/m/Y') }}<br>
+                    {% if sell.workDate %}
+                        Date des travaux au plus tard : {{ sell.workDate|date('d/m/Y') }}<br>
+                    {% endif %}
+                    {% if sell.workers %}
+                        <b>Techniciens :</b> {{ sell.workers }}
+                    {% elseif sell.user %}
+                        <b>Techniciens :</b> {{ sell.user.firstname }} {{ sell.user.lastname }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content avec tableau des services -->
+    <div class="pdf__content">
+        <div class="row mt-2">
+            <div class="col-12">
+                <table class="table table-nowrap table-centered mb-0 table-slim services">
+                    <thead>
+                        <tr>
+                            <th>Prestation</th>
+                            <th>Description</th>
+                            <th class="text-end">Unité</th>
+                            <th class="text-end">Prix U. HT</th>
+                            <th class="text-end">Quantité</th>
+                            <th class="text-end">Total HT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in sell.sellItems %}
+                            <tr class="service-row {{ item.servicePackage ? 'package-item' : '' }}">
+                                <td class="service-title">
+                                    <strong>{{ item.title }}</strong>
+                                    {% if item.servicePackage %}
+                                        <div class="package-indicator">
+                                            <small><em>Forfait : {{ item.servicePackage.name }}</em></small>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td class="description">
+                                    {{ item.description }}
+                                    {% if item.servicePackage and item.servicePackage.services %}
+                                        <div class="package-services">
+                                            <small><strong>Services inclus :</strong></small>
+                                            <ul class="service-list">
+                                                {% for service in item.servicePackage.services %}
+                                                    <li>{{ service.title }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% if item.servicePackage %}
+                                        Forfait
+                                    {% elseif item.service and item.service.unit == 'fixed' %}
+                                        Forfait
+                                    {% elseif item.service %}
+                                        {{ item.service.unit ?: '-' }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">{{ item.price|number_format(2, ',', ' ') }} €</td>
+                                <td class="text-end">{{ item.quantity }}</td>
+                                <td class="text-end">{{ item.total|number_format(2, ',', ' ') }} €</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sections après le tableau -->
+    <div class="mt-2">
+        {% if sell.details %}
+            <div class="row mt-2">
+                <div class="col-12">
+                    <div class="section--bordered p-1">
+                        <div class="title">Remarques/détails</div>
+                        <div class="comment mt-1">{{ sell.details }}</div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="section--bordered p-1">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" {{ sell.tenyear ? 'checked' : '' }}>
+                                <label class="form-check-label">Garantie décennale « 10 ans »</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" {{ sell.twoyear ? 'checked' : '' }}>
+                                <label class="form-check-label">Responsabilité civile 2 ans</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="info">Suivi annuel : {{ sell.followup }}</div>
+                            <div class="info">Frais de dossier : {{ sell.fees }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mt-2">
+                <div class="form-check d-inline-block me-3">
+                    <input type="checkbox" class="form-check-input" {{ sell.paymentMethod == 'Comptant' ? 'checked' : '' }}>
+                    <label class="form-check-label">Paiement comptant</label>
+                </div>
+                <div class="form-check d-inline-block">
+                    <input type="checkbox" class="form-check-input" {{ sell.paymentMethod == 'Financement' ? 'checked' : '' }}>
+                    <label class="form-check-label">
+                        Dossier de financement
+                        {% if sell.paymentMethod == 'Financement' %}: {{ sell.organism }}{% endif %}
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="pdf__footer">
+        <div class="row">
+            <div class="col-12 mt-3">
+                <div class="form-check d-inline-block me-3">
+                    <input type="checkbox" class="form-check-input">
+                    <label class="form-check-label">
+                        Je certifie avoir lu et accepté les conditions générales de la société
+                        {% if sell.company %}{{ sell.company.name }}{% else %}France Patrimoine EMC{% endif %}.
+                    </label>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="info info--small mt-2">
+                    Selon les informations fournies par nos soins, cette commande est calculée avec un taux de TVA à 10%,
+                    ce taux ne s'applique que pour un local de plus de deux ans, affecté totalement ou principalement à
+                    l'habitation (plus de 50% de la superficie). Elle ne pourra être applicable qu'après renvoi de
+                    l'attestation jointe.
+                </div>
+                <div class="info mt-3">
+                    Travaux effectués au prix de<br>
+                    > <strong>TOTAL HT</strong> .................................................................................................<br>
+                    > <strong>TOTAL TTC</strong> ................................................................................................
+                </div>
+            </div>
+            <div class="col-6">
+                <table class="table table-nowrap table-centered mb-0 table-slim mt-2">
+                    <tbody>
+                        <tr>
+                            <td><strong>Total HT</strong></td>
+                            <td>{{ (sell.total * 0.9)|number_format(2, ',', ' ') }} €</td>
+                            <td>
+                                <div class="form-check d-inline-block me-3">
+                                    <input type="checkbox" class="form-check-input" {{ sell.paymentMethod == 'Chèque' ? 'checked' : '' }}>
+                                    <label class="form-check-label">Chèques</label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>TVA</strong></td>
+                            <td>{{ (sell.total * 0.1)|number_format(2, ',', ' ') }} €</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total TTC</strong></td>
+                            <td>{{ sell.total|number_format(2, ',', ' ') }} €</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Acompte</strong></td>
+                            <td>{{ sell.depositAmount ? (sell.depositAmount|number_format(2, ',', ' ') ~ ' €') : '' }}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Solde</strong></td>
+                            <td>{{ sell.balanceAmount ? (sell.balanceAmount|number_format(2, ',', ' ') ~ ' €') : '' }}</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 mt-3">
+                <div class="info mt-2">
+                    En toutes lettres .......................................................................................................................<br>
+                    .......................................................................................................................
+                </div>
+                <div class="info mt-4">
+                    Fait à ..............................................................................................................
+                </div>
+                <div class="info mt-2">
+                    Le ...................................................................................................................
+                </div>
+            </div>
+            <div class="col-6 mt-3">
+                <div class="section--bordered p-1 info pb-6">
+                    <div class="info--large">SIGNATURE DU CLIENT</div>
+                    <small>Précédée de la mention "Bon pour accord"</small><br>
+                    <small>Devis reçu avant l'exécution des travaux</small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="small-square">Paraphe</div>
+            </div>
+        </div>
+
+        {% if sell.company %}
+            <div class="row">
+                <div class="col-12">
+                    <div class="info info--small mt-3 text-center">
+                        {{ sell.company.legal }}<br>
+                        {{ sell.company.name }} - {{ sell.company.address }} {{ sell.company.postcode }}
+                        <span class="uppercase">{{ sell.company.city }}</span> - {{ sell.company.telephone }} - {{ sell.company.email }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="page-number">Page 1 sur 1</div>
+    </div>
+{% endblock %}

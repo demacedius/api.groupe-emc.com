@@ -1,0 +1,162 @@
+{% extends "pdf/document_base.html.twig" %}
+
+{% block title %}Devis Client N°{{ sell.id }}{% endblock %}
+
+{% block content %}
+    <!-- Page 1 - Exemplaire Client -->
+    <div class="page">
+        {% include "pdf/_partials/header.html.twig" %}
+
+        <div class="document-title">
+            <h1>DEVIS</h1>
+            <div class="document-number">N°{{ sell.id }}</div>
+        </div>
+
+        <div class="client-info">
+            <div class="client-left">
+                {% if sell.customer %}
+                    {{ sell.customer.firstname }} {{ sell.customer.lastname }}<br>
+                    {{ sell.customer.address }}<br>
+                    {{ sell.customer.postcode }} {{ sell.customer.city }}<br>
+                    {{ sell.customer.phone ?: sell.customer.mobile }}
+                {% endif %}
+            </div>
+            <div class="client-right">
+                <strong>Exemplaire client</strong><br>
+                <strong>Date :</strong> {{ sell.createdDate|date('d/m/Y') }}<br>
+                {% if sell.workDate %}
+                    <strong>Date des travaux au plus tard :</strong> {{ sell.workDate|date('d/m/Y') }}<br>
+                {% endif %}
+                <strong>Techniciens :</strong> {{ sell.user.firstname }} {{ sell.user.lastname }}
+            </div>
+        </div>
+
+        {% include "pdf/_partials/prestations_table.html.twig" %}
+
+        {% include "pdf/_partials/remarques_section.html.twig" %}
+
+        {% include "pdf/_partials/garanties_section.html.twig" %}
+
+        {% include "pdf/_partials/paiement_section.html.twig" with {'checked_comptant': sell.paymentMethod != 'Financement'} %}
+
+        {% include "pdf/_partials/conditions_generales.html.twig" %}
+
+        {% include "pdf/_partials/financial_section.html.twig" %}
+
+        {% include "pdf/_partials/signature_section.html.twig" %}
+
+        {% include "pdf/_partials/footer.html.twig" %}
+
+        <div class="page-number">Page 1 sur 2</div>
+    </div>
+
+    <!-- Page 2 - Suite Exemplaire Client -->
+    <div class="page">
+        {% include "pdf/_partials/header.html.twig" %}
+
+        <div class="document-title">
+            <h1>DEVIS</h1>
+            <div class="document-number">N°{{ sell.id }}</div>
+        </div>
+
+        <div class="client-info">
+            <div class="client-left">
+                {% if sell.customer %}
+                    {{ sell.customer.firstname }} {{ sell.customer.lastname }}<br>
+                    {{ sell.customer.address }}<br>
+                    {{ sell.customer.postcode }} {{ sell.customer.city }}<br>
+                    {{ sell.customer.phone ?: sell.customer.mobile }}
+                {% endif %}
+            </div>
+            <div class="client-right">
+                <strong>Exemplaire client</strong><br>
+                <strong>Date :</strong> {{ sell.createdDate|date('d/m/Y') }}<br>
+                {% if sell.workDate %}
+                    <strong>Date des travaux au plus tard :</strong> {{ sell.workDate|date('d/m/Y') }}<br>
+                {% endif %}
+                <strong>Techniciens :</strong> {{ sell.user.firstname }} {{ sell.user.lastname }}
+            </div>
+        </div>
+
+        {% include "pdf/_partials/remarques_section.html.twig" %}
+
+        {% include "pdf/_partials/garanties_section.html.twig" %}
+
+        {% include "pdf/_partials/paiement_section.html.twig" with {'checked_comptant': sell.paymentMethod != 'Financement'} %}
+
+        <div class="conditions-checkbox mb-20">
+            <div class="checkbox checked" style="display: inline-block; margin-right: 10px;"></div>
+            <span style="font-size: 10px;">Je certifie avoir lu et accepté les conditions générales de la société France Patrimoine EMC.</span>
+        </div>
+
+        <div style="font-size: 9px; line-height: 1.4; margin-bottom: 20px;">
+            Selon les informations fournies par nos soins, ce devis est calculé avec
+            un taux de TVA à 10%, ce taux ne s'applique que pour un local de plus de deux
+            ans, affecté totalement ou principalement à l'habitation (plus de 50% de la
+            superficie). Elle ne pourra être applicable qu'après renvoi de l'attestation jointe.
+        </div>
+
+        <div style="margin-bottom: 15px; font-size: 10px;">
+            <div><strong>Travaux effectués au prix de</strong></div>
+            <div>> TOTAL HT ................................................................................................</div>
+            <div>> TOTAL TTC ...............................................................................................</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1;">
+                <div style="font-size: 10px; margin-bottom: 15px;"><strong>En toutes lettres</strong></div>
+                <div style="border-bottom: 1px dotted #333; margin-bottom: 10px; height: 15px;"></div>
+                <div style="border-bottom: 1px dotted #333; margin-bottom: 15px; height: 15px;"></div>
+
+                <div style="margin-bottom: 10px;">
+                    <div style="border-bottom: 1px dotted #333; margin-bottom: 5px; height: 15px;"></div>
+                    <span style="font-size: 9px;">Fait à </span>
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <div style="border-bottom: 1px dotted #333; margin-bottom: 5px; height: 15px;"></div>
+                    <span style="font-size: 9px;">Le </span>
+                </div>
+            </div>
+
+            <div style="flex: 1; margin-left: 20px;">
+                <table class="totaux-table">
+                    <tr>
+                        <td class="label">Total HT</td>
+                        <td class="montant">{{ (sell.total - (sell.total * 0.1))|number_format(2, ',', ' ') }} €</td>
+                        <td class="mode">
+                            <div class="checkbox {{ sell.paymentMethod == 'Chèque' ? 'checked' : '' }}"></div> Chèques
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">TVA</td>
+                        <td class="montant">{{ (sell.total * 0.1)|number_format(2, ',', ' ') }} €</td>
+                        <td class="mode"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Total TTC</td>
+                        <td class="montant">{{ sell.total|number_format(2, ',', ' ') }} €</td>
+                        <td class="mode"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Acompte</td>
+                        <td class="montant">{{ sell.depositAmount ? sell.depositAmount|number_format(2, ',', ' ') ~ ' €' : '' }}</td>
+                        <td class="mode"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Solde</td>
+                        <td class="montant">{{ sell.balanceAmount ? sell.balanceAmount|number_format(2, ',', ' ') ~ ' €' : '' }}</td>
+                        <td class="mode"></td>
+                    </tr>
+                </table>
+
+                {% include "pdf/_partials/signature_section.html.twig" %}
+            </div>
+        </div>
+
+        {% include "pdf/_partials/footer.html.twig" %}
+
+        <div class="paraphe">Paraphe</div>
+        <div class="page-number">Page 2 sur 2</div>
+    </div>
+{% endblock %}

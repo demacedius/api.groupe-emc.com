@@ -1,0 +1,62 @@
+<div class="financial-section">
+    <div style="flex: 1; font-size: 9px; line-height: 1.4;">
+        Selon les informations fournies par nos soins, cette commande est calculée avec
+        un taux de TVA à 10%, ce taux ne s'applique que pour un local de plus de deux
+        ans, affecté totalement ou principalement à l'habitation (plus de 50% de la
+        superficie). Elle ne pourra être applicable qu'après renvoi de l'attestation jointe.
+
+        <div style="margin-top: 15px; font-size: 10px;">
+            <div><strong>Travaux effectués au prix de</strong></div>
+            <div>> TOTAL HT ................................................................................................</div>
+            <div>> TOTAL TTC ...............................................................................................</div>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <div style="font-size: 10px; margin-bottom: 10px;"><strong>En toutes lettres</strong></div>
+            <div style="border-bottom: 1px dotted #333; margin-bottom: 8px; height: 15px;"></div>
+            <div style="border-bottom: 1px dotted #333; margin-bottom: 15px; height: 15px;"></div>
+
+            <div style="margin-bottom: 10px;">
+                <div style="border-bottom: 1px dotted #333; margin-bottom: 5px; height: 15px;"></div>
+                <span style="font-size: 9px;">Fait à </span>
+            </div>
+
+            <div style="margin-bottom: 10px;">
+                <div style="border-bottom: 1px dotted #333; margin-bottom: 5px; height: 15px;"></div>
+                <span style="font-size: 9px;">Le </span>
+            </div>
+        </div>
+    </div>
+
+    <div style="flex: 1; margin-left: 20px;">
+        <table class="totaux-table">
+            <tr>
+                <td class="label">Total HT</td>
+                <td class="montant">{{ (sell.total - (sell.total * 0.1))|number_format(2, ',', ' ') }} €</td>
+                <td class="mode">
+                    <div class="checkbox {{ sell.paymentMethod == 'Chèque' ? 'checked' : '' }}"></div> Chèques
+                </td>
+            </tr>
+            <tr>
+                <td class="label">TVA</td>
+                <td class="montant">{{ (sell.total * 0.1)|number_format(2, ',', ' ') }} €</td>
+                <td class="mode"></td>
+            </tr>
+            <tr>
+                <td class="label">Total TTC</td>
+                <td class="montant">{{ sell.total|number_format(2, ',', ' ') }} €</td>
+                <td class="mode"></td>
+            </tr>
+            <tr>
+                <td class="label">Acompte</td>
+                <td class="montant">{{ sell.depositAmount ? sell.depositAmount|number_format(2, ',', ' ') ~ ' €' : '' }}</td>
+                <td class="mode"></td>
+            </tr>
+            <tr>
+                <td class="label">Solde</td>
+                <td class="montant">{{ sell.balanceAmount ? sell.balanceAmount|number_format(2, ',', ' ') ~ ' €' : '' }}</td>
+                <td class="mode"></td>
+            </tr>
+        </table>
+    </div>
+</div>

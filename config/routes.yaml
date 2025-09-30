@@ -1,0 +1,23 @@
+token:
+    path: /token
+    methods: ['POST']
+
+stats:
+    path: /api/stats
+    controller: App\Controller\StatisticsController
+    methods: ['GET']
+
+profil-b-stats:
+    path: /api/profil-b-stats
+    controller: App\Controller\ProfilBStatisticsController
+    methods: ['GET']
+
+profil-b-users-stats:
+    path: /api/profil-b-users-stats
+    controller: App\Controller\ProfilBUsersStatisticsController
+    methods: ['GET']
+
+profil-b-sales:
+    path: /api/profil-b-sales
+    controller: App\Controller\ProfilBSalesController
+    methods: ['GET']

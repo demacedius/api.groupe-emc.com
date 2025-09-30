@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Document{% endblock %}</title>
+    <style>
+        /* Style identique au frontend Vue.js */
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 0.7rem;
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+            color: black;
+        }
+
+        .pdf {
+            position: relative;
+            height: 1080px;
+        }
+
+        /* Couleurs par entreprise - EMC/France Patrimoine */
+        .color-FP {
+            --color: #354E85;
+        }
+
+        .color-FP tbody {
+            border-top: 1px solid var(--color) !important;
+        }
+
+        .color-FP .section--bordered,
+        .color-FP table,
+        .color-FP .small-square {
+            border: 1px solid var(--color);
+        }
+
+        /* Bootstrap-like grid */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+            break-inside: avoid;
+        }
+
+        .col-4 { flex: 0 0 33.333333%; max-width: 33.333333%; padding: 0 15px; }
+        .col-5 { flex: 0 0 41.666667%; max-width: 41.666667%; padding: 0 15px; }
+        .col-6 { flex: 0 0 50%; max-width: 50%; padding: 0 15px; }
+        .col-7 { flex: 0 0 58.333333%; max-width: 58.333333%; padding: 0 15px; }
+        .col-12 { flex: 0 0 100%; max-width: 100%; padding: 0 15px; }
+        .offset-4 { margin-left: 33.333333%; }
+
+        .text-center { text-align: center; }
+        .text-end { text-align: right; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 1rem; }
+        .mt-4 { margin-top: 1.5rem; }
+        .mb-0 { margin-bottom: 0; }
+        .me-3 { margin-right: 1rem; }
+        .p-1 { padding: 0.25rem; }
+        .pb-6 { padding-bottom: 6em !important; }
+        .d-inline-block { display: inline-block; }
+
+        /* Logo styles */
+        .logo {
+            max-width: 300px;
+            max-height: 80px;
+        }
+
+        /* Info text styles */
+        .info {
+            color: black;
+            line-height: 1.5;
+        }
+
+        .info--small {
+            font-size: 10px;
+        }
+
+        .info--medium {
+            font-size: 0.8rem;
+        }
+
+        .info--large {
+            font-size: 18px;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: black;
+            line-height: 1.5;
+        }
+
+        /* Table styles identiques au frontend */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        .table-nowrap {
+            table-layout: fixed;
+        }
+
+        .table-centered {
+            text-align: center;
+        }
+
+        .table-slim th, .table-slim td {
+            padding: 0.25rem 0.5rem !important;
+        }
+
+        .table--small {
+            font-size: 8px;
+        }
+
+        .table--small th, .table--small td {
+            padding: 2px;
+        }
+
+        .services {
+            vertical-align: baseline !important;
+        }
+
+        .services td {
+            vertical-align: baseline !important;
+        }
+
+        .services th, .services td {
+            padding: 0.25rem 0.5rem !important;
+        }
+
+        td.service-title, td.description {
+            white-space: pre-wrap;
+            max-width: 200px;
+        }
+
+        thead {
+            color: black;
+        }
+
+        /* Sections avec bordures */
+        .section--bordered {
+            border: 1px solid var(--color);
+            padding: 0.25rem;
+        }
+
+        /* Checkbox styles */
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .form-check-input {
+            width: 12px;
+            height: 12px;
+        }
+
+        .form-check-label {
+            color: black;
+            line-height: 1.5;
+        }
+
+        /* Comment style */
+        .comment {
+            white-space: pre-wrap;
+        }
+
+        /* Footer elements */
+        .small-square {
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            right: 10px;
+            top: 5px;
+            font-size: 7px;
+            padding: 3px;
+            border: 1px solid var(--color);
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        /* Package styling */
+        .package-indicator {
+            margin-top: 2px;
+            color: #666;
+        }
+
+        .package-services {
+            margin-top: 4px;
+            color: #555;
+        }
+
+        .service-list {
+            margin: 2px 0 0 15px;
+            padding: 0;
+        }
+
+        .service-list li {
+            margin: 1px 0;
+            font-size: 0.65rem;
+        }
+
+        .service-row.package-item {
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        .service-row.package-item .service-title strong {
+            color: #0056b3;
+        }
+
+        /* Page layout */
+        .pdf__header {
+            margin-bottom: 15px;
+        }
+
+        .pdf__content {
+            page-break-inside: avoid;
+        }
+
+        .pdf__footer {
+            position: absolute;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            padding: 0 20px;
+        }
+
+        .page-number {
+            text-align: right;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="pdf color-FP">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

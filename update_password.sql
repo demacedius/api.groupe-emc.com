@@ -1,0 +1,2 @@
+UPDATE user SET password = '$2y$13$Ry/lbN1zqJY7z8Z6xR5fmeZp5a9lLGYjKqY5mZ6VvOoR7E.5vLXEW' WHERE email = 'commercial@test.com';
+UPDATE user SET password = '$2y$13$Ry/lbN1zqJY7z8Z6xR5fmeZp5a9lLGYjKqY5mZ6VvOoR7E.5vLXEW' WHERE email = 'manager@test.com';

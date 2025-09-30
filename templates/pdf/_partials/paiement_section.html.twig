@@ -1,0 +1,12 @@
+<div class="paiement-section">
+    <div class="paiement-options">
+        <div class="paiement-option">
+            <div class="checkbox {{ checked_comptant|default(true) ? 'checked' : '' }}" style="display: inline-block; margin-right: 8px;"></div>
+            <span><strong>Paiement comptant</strong></span>
+        </div>
+        <div class="paiement-option">
+            <div class="checkbox {{ not checked_comptant|default(true) ? 'checked' : '' }}" style="display: inline-block; margin-right: 8px;"></div>
+            <span><strong>Dossier de financement</strong></span>
+        </div>
+    </div>
+</div>
